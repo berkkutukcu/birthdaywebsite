@@ -1,308 +1,395 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doğum Günü Oyunu</title>
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7T69D8FHSB"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-7T69D8FHSB');
-    </script>
-
+    <title>ozur dilerim ;c</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        @keyframes shake {
-            0%, 100% { transform: translate(-50%, -50%); }
-            10%, 30%, 50%, 70%, 90% { transform: translate(calc(-50% - 10px), -50%); }
-            20%, 40%, 60%, 80% { transform: translate(calc(-50% + 10px), -50%); }
+        :root {
+            --primary-bg: #fdf2f8;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --green-btn: #4ade80;
+            --red-btn: #fb7185;
+            --text-color: #4b5563;
+            --accent-pink: #f472b6;
         }
-        .shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        body {
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            background-image: radial-gradient(circle at 20% 30%, #fce7f3 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, #fae8ff 0%, transparent 50%);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-            overflow: hidden; /* İmleç takibi için */
+            overflow: hidden;
+            color: var(--text-color);
         }
-        canvas {
-            border: 2px solid #333;
-            background-color: white;
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-        }
-        #startScreen {
+
+        .container {
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-            margin-top: -100px; /* Yazıyı yukarı taşı */
-            transition: transform 2s ease-in-out, opacity 2s ease-in-out;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 50px rgba(244, 114, 182, 0.15);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
-        #startScreen.slide-out {
-            transform: translateY(100vh);
-            opacity: 0;
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            color: #be185d;
         }
-        #startScreen h1 {
-            color: #333;
-            font-family: Arial, sans-serif;
-            font-size: 2.5em; /* Yazıyı büyüt */
-            margin: 0;
-        }
-        #startRose {
-            width: 300px; /* Gülü büyüt */
+
+        .cat-container {
+            width: 300px;
             height: auto;
-            cursor: none; /* Normal imleci gizle */
-            transition: transform 0.3s;
+            margin: 4rem auto 2rem;
+            /* Üstten boşluk bırakıldı baloncuk için */
+            position: relative;
+            border-radius: 1rem;
+            /* overflow: hidden silindi, baloncuk gözüksün diye */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-        #startRose:hover {
-            transform: scale(1.1);
+
+        .cat-image {
+            width: 100%;
+            display: block;
+            border-radius: 1rem;
+            /* Köşeleri burada yuvarlıyoruz */
         }
-        #customCursor {
-            position: fixed;
-            width: 50px;
-            height: 50px;
-            pointer-events: none;
-            z-index: 9999;
-            display: none;
-        }
-        #transitionOverlay {
-            position: fixed;
+
+        .eye-overlay {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: black;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-            display: none;
-            z-index: 1000;
-        }
-        #transitionOverlay.active {
-            opacity: 1;
-        }
-        .transition-text {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-family: Arial, sans-serif;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-            text-align: center;
-            z-index: 1001;
-        }
-        .transition-text.active {
-            opacity: 1;
-        }
-        #creditText {
-            font-size: 3em;
-        }
-        #specialText {
-            font-size: 5em;
-            font-weight: bold;
-        }
-        #dialogueContainer {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            display: none;
-            z-index: 1002;
-            transform-origin: center center;
-        }
-        #dialogueText {
-            font-size: 2em;
-            margin-bottom: 20px;
-            font-family: Arial, sans-serif;
-            color: #333;
-            transition: color 0.3s;
-        }
-        #dialogueText.error {
-            color: #ff0000;
-        }
-        #readyButton {
-            padding: 15px 30px;
-            font-size: 1.5em;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #readyButton:hover {
-            background-color: #45a049;
-        }
-        #questionContainer {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-        .question-image {
-            width: 250px;
-            height: auto;
-            margin: 10px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-            border-radius: 10px;
-        }
-        .question-image:hover {
-            transform: scale(1.1);
-        }
-        .question-image.disabled {
             pointer-events: none;
-            filter: grayscale(0.5) brightness(0.8);
-            transform: none !important;
-            transition: none !important;
-            cursor: not-allowed;
         }
-        .question-image.disabled:hover {
-            transform: none !important;
+
+        /* Cute SVG Cat Styles */
+        #cat-svg {
+            width: 100%;
+            height: 100%;
         }
-        #imagesContainer {
+
+        .eye-pupil {
+            transition: transform 0.1s ease-out;
+        }
+
+        .buttons {
             display: flex;
+            gap: 1.5rem;
             justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
+            align-items: center;
             flex-wrap: wrap;
         }
-        #previousQuestionsContainer {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
+
+        .btn {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            user-select: none;
         }
-        #finalQuestionContainer {
-            display: none;
-            margin-top: 30px;
+
+        #green-btn {
+            background-color: var(--green-btn);
+            color: white;
         }
-        #finalInput {
-            font-size: 2em;
-            width: 120px;
-            text-align: center;
+
+        #green-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4);
         }
-        #finalButton {
-            font-size: 1.5em;
-            margin-left: 10px;
+
+        #red-btn {
+            background-color: var(--red-btn);
+            color: white;
+            position: relative;
         }
-        #blackout {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: black;
-            z-index: 9999;
-            transition: opacity 2s;
+
+        #red-btn:hover {
+            transform: scale(0.95);
+        }
+
+        .message {
+            margin-top: 1.5rem;
+            font-weight: 600;
+            color: #e11d48;
+            height: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .message.visible {
+            opacity: 1;
+        }
+
+        /* Floating hearts for extra cuteness */
+        .heart {
+            position: absolute;
+            pointer-events: none;
+            animation: float 4s ease-in infinite;
             opacity: 0;
         }
-        #sjsjText {
-            display: none;
-            color: white;
-            font-size: 5vw;
-            text-align: center;
+
+        .speech-bubble {
             position: absolute;
-            top: 50%;
+            top: -75px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100vw;
-            height: 100vh;
-            line-height: 100vh;
-        }
-        #fullscreenNotice {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 16px 24px;
-            z-index: 20000;
-            font-family: Arial, sans-serif;
-            font-size: 1.1em;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        #fullscreenButton {
-            font-size: 1em;
-            padding: 6px 18px;
-            border-radius: 6px;
-            border: none;
-            background: #4CAF50;
+            transform: translateX(-50%) scale(0);
+            background: #be185d;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
             color: white;
-            cursor: pointer;
-            margin-top: 4px;
+            box-shadow: 0 10px 25px rgba(190, 24, 93, 0.4);
+            white-space: nowrap;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
         }
-        #fullscreenButton:hover {
-            background: #388e3c;
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #be185d;
+        }
+
+        .speech-bubble.visible {
+            transform: translateX(-50%) scale(1);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.8;
+            }
+
+            90% {
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div id="startScreen">
-        <h1>Oyuna başlamak için Lotus'u al (Sanırım bir daha oynayacaksın <3)</h1>
-        <div style="display:flex; gap:20px; align-items:center; position:relative; z-index:1000;">
-            <img id="startRose" src="Gül.png" alt="Başlangıç Gülü">
+
+    <div class="container" id="main-card">
+        <div class="cat-container">
+            <div id="speech-bubble" class="speech-bubble">Mesaj buraya gelecek</div>
+            <img src="duduyatpng.png" alt="Dudu" class="cat-image">
+            <svg class="eye-overlay" viewBox="0 0 594 567">
+                <!-- Göz Akı (Beyaz Daireler) -->
+                <circle cx="310" cy="160" r="18" fill="white" />
+                <circle cx="360" cy="140" r="18" fill="white" />
+
+                <g class="eye-pupil" id="left-pupil">
+                    <circle cx="310" cy="160" r="10" fill="black" />
+                </g>
+                <g class="eye-pupil" id="right-pupil">
+                    <circle cx="360" cy="140" r="10" fill="black" />
+                </g>
+            </svg>
         </div>
+
+        <h1 id="main-title">barisalim mi🥺</h1>
+
+        <div class="buttons" id="button-group">
+            <button id="green-btn" class="btn">Barışalım</button>
+            <button id="red-btn" class="btn">Küsüz</button>
+        </div>
+
+        <div id="warning-msg" class="message">mecbur buna tikliycan </div>
     </div>
-    <div id="transitionOverlay"></div>
-    <div id="creditText" class="transition-text">Berk K. tarafından hazırlanmıştır</div>
-    <div id="specialText" class="transition-text">Sıla'ya özel...</div>
-    <div id="dialogueContainer">
-        <div id="dialogueText"></div>
-        <button id="readyButton" style="display: none;">Hazırım</button>
-        <div id="questionContainer">
-            <div id="imagesContainer">
-                <img src="Soru1_1.png" alt="Mouse 1" class="question-image" data-correct="false">
-                <img src="Soru1_2.png" alt="Mouse 2" class="question-image" data-correct="false">
-                <img src="Soru1_3.png" alt="Mouse 3" class="question-image" data-correct="true">
-            </div>
-        </div>
-        <div id="previousQuestionsContainer"></div>
-        <div id="finalQuestionContainer" style="display:none; margin-top:30px;">
-            <input id="finalInput" type="number" placeholder="Sayı gir" style="font-size:2em; width:120px; text-align:center;">
-            <button id="finalButton" style="font-size:1.5em; margin-left:10px;">Gir</button>
-        </div>
-    </div>
-    <img id="customCursor" src="El.png" alt="İmleç">
-    <canvas id="gameCanvas"></canvas>
-    <div id="blackout" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:9999; transition:opacity 2s; opacity:0;">
-        <div id="sjsjText" style="display:none; color:white; font-size:5vw; text-align:center; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100vw; height:100vh; line-height:100vh;"></div>
-        <div id="afterSJText" style="display:none; color:white; font-size:3vw; text-align:center; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);"></div>
-        <video id="finalVideo" src="Video1.mp4" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); max-width:90vw; max-height:90vh;" playsinline></video>
-        <div id="afterVideoContainer" style="display:none; color:white; text-align:center; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100vw;">
-            <div id="afterVideoText" style="font-size:2.5vw; margin-bottom:30px;"></div>
-            <button id="startGameButton" style="font-size:2vw; padding:20px 40px; border-radius:10px; border:none; background:#4CAF50; color:white; cursor:pointer;">Oyuna Başlamak İçin Tıkla</button>
-        </div>
-        <div id="dialogContainer" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:white; width:100%;">
-            <p id="dialogText" style="font-size:3vw; margin-bottom:20px;">TAK TAK TAK</p>
-            <button id="openDoorButton" style="font-size:2vw; padding:15px 30px; border-radius:10px; border:none; background:#4CAF50; color:white; cursor:pointer; display:block; margin:0 auto;">Kapıyı Aç</button>
-        </div>
-    </div>
-    <div id="fullscreenNotice">
-        <div>Lütfen oyunu tam ekranda oynayınız</div>
-        <button id="fullscreenButton">Tam ekrana almak için tıkla</button>
-    </div>
-    <script src="game.js"></script>
+
+    <script>
+        const leftPupil = document.getElementById('left-pupil');
+        const rightPupil = document.getElementById('right-pupil');
+        const redBtn = document.getElementById('red-btn');
+        const greenBtn = document.getElementById('green-btn');
+        const warningMsg = document.getElementById('warning-msg');
+        const mainTitle = document.getElementById('main-title');
+        const speechBubble = document.getElementById('speech-bubble');
+
+        let redClickCount = 0;
+        let isAngry = false;
+        let dodgeMode = false;
+
+        const duduMessages = [
+            "berk seni cok sebio barış bnce",
+            "sebisip barışın bnce",
+            "ya silaaaa barıs artıkk"
+        ];
+
+        // Eye tracking
+        const handleMove = (x, y) => {
+            if (isAngry) return;
+            trackEye(x, y, leftPupil, 310, 160);
+            trackEye(x, y, rightPupil, 360, 140);
+        };
+
+        document.addEventListener('mousemove', (e) => handleMove(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => {
+            handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+        document.addEventListener('touchstart', (e) => {
+            handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+
+        function trackEye(mouseX, mouseY, pupil, centerX, centerY) {
+            const svg = document.querySelector('.eye-overlay');
+            const rect = svg.getBoundingClientRect();
+
+            // Convert page mouse coords to SVG relative coords
+            const svgCenterX = rect.left + (centerX * rect.width / 594);
+            const svgCenterY = rect.top + (centerY * rect.height / 567);
+
+            const angle = Math.atan2(mouseY - svgCenterY, mouseX - svgCenterX);
+            const distance = Math.min(6, Math.hypot(mouseX - svgCenterX, mouseY - svgCenterY) / 10);
+
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+
+            pupil.style.transform = `translate(${dx}px, ${dy}px)`;
+        }
+
+        // Red button interactions
+        const handleDodgeTrigger = () => {
+            if (dodgeMode) {
+                isAngry = false;
+                dodgeButton();
+                return true;
+            }
+            return false;
+        };
+
+        redBtn.addEventListener('mouseenter', () => {
+            if (handleDodgeTrigger()) return;
+
+            // Look away logic
+            isAngry = true;
+            leftPupil.style.transform = `translate(8px, 0px)`;
+            rightPupil.style.transform = `translate(8px, 0px)`;
+        });
+
+        redBtn.addEventListener('touchstart', (e) => {
+            if (handleDodgeTrigger()) {
+                e.preventDefault(); // Buton kaçtığında tıklamayı önlemek için
+            }
+        });
+
+        redBtn.addEventListener('mouseleave', () => {
+            if (dodgeMode) return;
+            isAngry = false;
+        });
+
+        redBtn.addEventListener('click', () => {
+            if (dodgeMode) return;
+
+            redClickCount++;
+
+            // Update speech bubble
+            if (redClickCount <= duduMessages.length) {
+                speechBubble.innerText = duduMessages[redClickCount - 1];
+                speechBubble.classList.add('visible');
+            }
+
+            // Green button grows
+            const scale = 1 + (redClickCount * 0.4);
+            greenBtn.style.transform = `scale(${scale})`;
+
+            if (redClickCount >= 3) {
+                activateDodgeMode();
+            }
+        });
+
+        function activateDodgeMode() {
+            dodgeMode = true;
+            isAngry = false;
+            warningMsg.classList.add('visible');
+            mainTitle.innerText = "DUDU SİNİRLENDİ";
+
+            // Move button to body to ensure fixed position is relative to viewport
+            document.body.appendChild(redBtn);
+            redBtn.style.position = 'fixed';
+            redBtn.style.zIndex = '9999';
+            redBtn.style.transition = 'none'; // Jump instantly
+            dodgeButton();
+        }
+
+        function dodgeButton() {
+            const margin = 20; // Ekran kenarlarından minimum mesafe
+            const maxX = Math.max(0, window.innerWidth - redBtn.offsetWidth - margin);
+            const maxY = Math.max(0, window.innerHeight - redBtn.offsetHeight - margin);
+
+            const newX = Math.random() * maxX;
+            const newY = Math.random() * maxY;
+
+            redBtn.style.left = `${newX}px`;
+            redBtn.style.top = `${newY}px`;
+        }
+
+        greenBtn.addEventListener('click', () => {
+            mainTitle.innerText = "Seni çok seviyorum! ❤️";
+            document.getElementById('button-group').style.display = 'none';
+            warningMsg.classList.remove('visible');
+            startHearthRain();
+        });
+
+        function startHearthRain() {
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.className = 'heart';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 4000);
+            }, 100);
+        }
+    </script>
 </body>
-</html> 
+
+</html>
